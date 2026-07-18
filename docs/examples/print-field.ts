@@ -1,6 +1,6 @@
 /**
  * Minimal illustration of a proprietary print engine using the annotation spec.
- * Not wired into the Angular app — for documentation / video walkthrough only.
+ * Not wired into the Angular app — documentation example only.
  */
 import { resolvePath, materializeCollectionPath, hasCollectionPlaceholder } from '../../src/app/utils/path-resolver';
 

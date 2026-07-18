@@ -18,10 +18,6 @@ A portable data structure for annotating fields/boxes on U.S. tax forms, with a 
 | **Example Form 1040 template** | [`src/assets/templates/irs_1040_2025.json`](src/assets/templates/irs_1040_2025.json) |
 | **Nested sample tax data** | [`src/assets/values/irs_1040_2025.sample.json`](src/assets/values/irs_1040_2025.sample.json) |
 | **Reference overlay app** | Angular playground (this repo) |
-| **Video script** | [`docs/VIDEO_WALKTHROUGH.md`](docs/VIDEO_WALKTHROUGH.md) |
-
-> **Video:** Record a ≤5 minute Loom using the walkthrough script, then add the link here:  
-> `LOOM_URL=` _(paste after recording)_
 
 ---
 
@@ -92,7 +88,6 @@ Resolver implementation: `src/app/utils/path-resolver.ts`.
 ```
 docs/
   SPECIFICATION.md          # Full written spec (primary assessment doc)
-  VIDEO_WALKTHROUGH.md      # Loom script
   schema/                   # JSON Schema
 src/app/
   models/                   # TypeScript interfaces
