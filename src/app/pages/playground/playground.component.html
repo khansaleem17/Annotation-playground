@@ -1,0 +1,56 @@
+@if (!showPlayground()) {
+  <div class="processing-screen">
+    <div class="processing-card">
+      <h2 class="processing-title">Processing Pipeline</h2>
+      <p class="processing-subtitle">{{ state.fileName() }}</p>
+
+      <ul class="pipeline-list">
+        @for (stage of state.processingStages(); track stage.id) {
+          <li
+            class="pipeline-item"
+            [class.complete]="stage.status === 'complete'"
+            [class.active]="stage.status === 'active'"
+            [class.error]="stage.status === 'error'"
+          >
+            <span class="pipeline-icon">{{ stageIcon(stage) }}</span>
+            <span class="pipeline-label">{{ stage.label }}</span>
+            @if (stage.status === 'active') {
+              <span class="pipeline-spinner animate-pulse-dot">…</span>
+            }
+          </li>
+        }
+      </ul>
+
+      @if (processingError()) {
+        <div class="error-box">
+          <p>{{ processingError() }}</p>
+          <a routerLink="/" class="back-link">← Back to upload</a>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="playground-layout">
+    <app-toolbar
+      (zoomIn)="onZoomIn()"
+      (zoomOut)="onZoomOut()"
+      (fitWidth)="onFitWidth()"
+    />
+
+    <div class="playground-body">
+      <aside class="panel-left">
+        <app-annotation-tree />
+      </aside>
+
+      <main class="panel-center">
+        <app-pdf-viewer [pageNumber]="1" />
+      </main>
+
+      <aside class="panel-right">
+        <app-inspector />
+      </aside>
+    </div>
+
+    <app-status-bar />
+  </div>
+}

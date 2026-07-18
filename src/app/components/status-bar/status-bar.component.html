@@ -1,0 +1,18 @@
+<div class="status-bar">
+  <div class="status-left">
+    <span class="status-dot"></span>
+    <span class="status-message">{{ state.statusMessage() }}</span>
+  </div>
+  <div class="status-right">
+    @if (state.fileName()) {
+      <span class="status-item">{{ state.fileName() }}</span>
+    }
+    @if (state.formId()) {
+      <span class="status-item mono">{{ state.formId() }}</span>
+    }
+    @if (templateService.template()) {
+      <span class="status-item">{{ templateService.template()!.formName }}</span>
+    }
+    <span class="status-item">Zoom {{ zoomPercent() }}%</span>
+  </div>
+</div>

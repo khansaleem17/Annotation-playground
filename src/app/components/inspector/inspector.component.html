@@ -1,0 +1,80 @@
+<div class="inspector-panel">
+  <div class="panel-header">
+    <span class="panel-title">Inspector</span>
+  </div>
+
+  <div class="inspector-content">
+    @if (!selectedAnnotation()) {
+      <p class="empty-state">Select an annotation to inspect</p>
+    } @else {
+      @let ann = selectedAnnotation()!;
+
+      <section class="inspector-section">
+        <h3 class="section-label">Identity</h3>
+        <dl class="prop-list">
+          <dt>ID</dt>
+          <dd class="mono">{{ ann.id }}</dd>
+          <dt>Type</dt>
+          <dd><span class="chip">{{ ann.type }}</span></dd>
+          @if (ann.fieldType) {
+            <dt>Field Type</dt>
+            <dd><span class="chip">{{ ann.fieldType }}</span></dd>
+          }
+        </dl>
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Binding</h3>
+        <dl class="prop-list">
+          <dt>Binding Path</dt>
+          <dd class="mono">{{ ann.bindingPath ?? '—' }}</dd>
+          <dt>Semantic Entity</dt>
+          <dd class="mono">{{ ann.semanticEntity ?? '—' }}</dd>
+        </dl>
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Value</h3>
+        <input
+          type="text"
+          class="value-input"
+          [ngModel]="editValue()"
+          (ngModelChange)="editValue.set($event); onValueChange($event)"
+          placeholder="No value"
+        />
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Validation</h3>
+        <pre class="code-block">{{ formatJson(ann.validation) }}</pre>
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Appearance</h3>
+        <pre class="code-block">{{ formatJson(ann.appearance) }}</pre>
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Geometry</h3>
+        <dl class="prop-list">
+          <dt>Bounding Box</dt>
+          <dd class="mono small">{{ formatBox(ann.boundingBox) }}</dd>
+        </dl>
+      </section>
+
+      <section class="inspector-section">
+        <h3 class="section-label">Extraction</h3>
+        <dl class="prop-list">
+          <dt>Confidence</dt>
+          <dd>{{ formatConfidence(extractedConfidence()) }}</dd>
+          <dt>Review Status</dt>
+          <dd>
+            <span class="chip" [class]="ann.reviewStatus ?? 'pending'">
+              {{ ann.reviewStatus ?? 'pending' }}
+            </span>
+          </dd>
+        </dl>
+      </section>
+    }
+  </div>
+</div>

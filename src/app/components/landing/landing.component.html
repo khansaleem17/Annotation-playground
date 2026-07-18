@@ -1,0 +1,94 @@
+<div class="min-h-screen relative flex flex-col items-center justify-center px-6 py-12">
+  <button
+    type="button"
+    class="absolute top-5 right-5 inline-flex items-center gap-2 rounded-lg border border-border bg-surface-1 px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-hover hover:text-text-primary"
+    [attr.aria-label]="themeService.theme() === 'light' ? 'Enable dark mode' : 'Enable light mode'"
+    (click)="themeService.toggle()"
+  >
+    @if (themeService.theme() === 'light') {
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20.35 15.35A8 8 0 018.65 3.65 8 8 0 1020.35 15.35z" />
+      </svg>
+      Dark mode
+    } @else {
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36-6.36-1.42 1.42M7.05 16.95l-1.41 1.41m12.73 0-1.42-1.41M7.05 7.05 5.64 5.64M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      Light mode
+    }
+  </button>
+  <div class="w-full max-w-xl">
+    <div class="text-center mb-10">
+      <img
+        src="/instead-logo.svg"
+        alt="Instead"
+        class="h-9 w-auto mx-auto mb-7"
+      />
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-2 border border-border text-xs text-text-secondary mb-6"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+        Engineering Prototype
+      </div>
+      <h1 class="text-3xl font-semibold tracking-tight text-text-primary mb-3">
+        Instead Annotation Playground
+      </h1>
+      <p class="text-text-secondary text-sm leading-relaxed max-w-md mx-auto">
+        Upload an IRS tax form to visualize annotations defined by the template specification.
+      </p>
+    </div>
+
+    <div
+      class="rounded-xl border-2 border-dashed transition-all duration-200 p-10 text-center cursor-pointer"
+      [class.border-accent]="isDragging()"
+      [class.bg-surface-2]="isDragging()"
+      [class.border-border]="!isDragging()"
+      [class.hover:border-border-hover]="!isDragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      <div class="mb-4">
+        <svg
+          class="w-10 h-10 mx-auto text-text-muted"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+      </div>
+      <p class="text-text-primary text-sm font-medium mb-1">Drag &amp; drop your PDF here</p>
+      <p class="text-text-muted text-xs mb-5">or</p>
+      <label
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-sm font-medium cursor-pointer transition-colors"
+      >
+        Browse Files
+        <input type="file" accept="application/pdf" class="hidden" (change)="onBrowse($event)" />
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="mt-4 text-center text-sm text-red-400">{{ error() }}</p>
+    }
+
+    <div class="mt-8 rounded-xl bg-surface-1 border border-border p-5">
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">
+        Supported Forms
+      </h2>
+      <ul class="space-y-2">
+        @for (form of supportedForms(); track form.id) {
+          <li class="flex items-center gap-2 text-sm text-text-secondary">
+            <span class="text-success">✓</span>
+            {{ form.displayName }} ({{ form.taxYear }})
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>

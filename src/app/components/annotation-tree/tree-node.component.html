@@ -1,0 +1,22 @@
+<div class="tree-node" [style.padding-left.px]="depth() * 12">
+  <div
+    class="tree-row"
+    [class.selected]="isSelected()"
+    [class.page-row]="depth() === 0"
+    (click)="onRowClick($event)"
+  >
+    @if (hasChildren()) {
+      <span class="chevron" [class.open]="expanded()" (click)="toggleExpand($event)">›</span>
+    } @else {
+      <span class="chevron-spacer"></span>
+    }
+    <span class="type-badge" [class]="node().type">{{ typeIcon() }}</span>
+    <span class="node-label">{{ node().label }}</span>
+  </div>
+
+  @if (hasChildren() && expanded()) {
+    @for (child of node().children; track child.id) {
+      <app-tree-node [node]="child" [depth]="depth() + 1" />
+    }
+  }
+</div>

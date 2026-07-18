@@ -1,0 +1,36 @@
+<div #container class="pdf-container" (click)="onCanvasClick()">
+  <div class="pdf-stage">
+    <canvas #canvas class="pdf-canvas"></canvas>
+
+    <div class="overlay-layer">
+      @for (ann of renderedAnnotations(); track ann.id) {
+        <div
+          class="annotation-overlay animate-fade-in"
+          [class.selected]="isSelected(ann.id)"
+          [class.no-box]="!showBox()"
+          [style.left.px]="ann.pixelBox.x"
+          [style.top.px]="ann.pixelBox.y"
+          [style.width.px]="ann.pixelBox.width"
+          [style.height.px]="ann.pixelBox.height"
+          [style.font-size.px]="ann.appearance?.fontSize ?? 10"
+          [style.text-align]="ann.appearance?.textAlign ?? 'left'"
+          [style.color]="ann.appearance?.color ?? '#1a1a1a'"
+          (click)="onAnnotationClick(ann.id, $event)"
+        >
+          @if (showValue(ann)) {
+            <span class="annotation-value">{{ ann.displayValue }}</span>
+          }
+          @if (showConfidence(ann) && ann.confidence !== undefined) {
+            <span class="annotation-meta confidence">{{ formatConfidence(ann.confidence) }}</span>
+          }
+          @if (showBinding(ann)) {
+            <span class="annotation-meta binding">{{ ann.bindingPath }}</span>
+          }
+          @if (showSemantic(ann)) {
+            <span class="annotation-meta semantic">{{ ann.semanticEntity }}</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

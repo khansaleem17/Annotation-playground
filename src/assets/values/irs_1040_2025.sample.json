@@ -1,0 +1,80 @@
+{
+  "formId": "irs_1040_2025",
+  "extractedAt": "2025-03-15T10:30:00Z",
+  "values": {
+    "taxpayer.firstName": {
+      "annotationId": "taxpayer.firstName",
+      "value": "Jane",
+      "confidence": 0.97,
+      "source": "ocr"
+    },
+    "taxpayer.lastName": {
+      "annotationId": "taxpayer.lastName",
+      "value": "Smith",
+      "confidence": 0.96,
+      "source": "ocr"
+    },
+    "taxpayer.ssn": {
+      "annotationId": "taxpayer.ssn",
+      "value": "123456789",
+      "confidence": 0.94,
+      "source": "ocr"
+    },
+    "taxpayer.dateOfBirth": {
+      "annotationId": "taxpayer.dateOfBirth",
+      "value": "1985-04-12",
+      "confidence": 0.91,
+      "source": "ocr"
+    },
+    "employer.companyName": {
+      "annotationId": "employer.companyName",
+      "value": "Acme Corporation",
+      "confidence": 0.89,
+      "source": "ocr"
+    },
+    "employer.ein": {
+      "annotationId": "employer.ein",
+      "value": "12-3456789",
+      "confidence": 0.87,
+      "source": "ocr"
+    },
+    "dependents": [
+      {
+        "annotationId": "dependents.item.firstName",
+        "value": "Alex",
+        "confidence": 0.85,
+        "source": "ocr"
+      },
+      {
+        "annotationId": "dependents.item.ssn",
+        "value": "987654321",
+        "confidence": 0.82,
+        "source": "ocr"
+      },
+      {
+        "annotationId": "dependents.item.relationship",
+        "value": "Son",
+        "confidence": 0.88,
+        "source": "ocr"
+      }
+    ],
+    "income.wages": {
+      "annotationId": "income.wages",
+      "value": "78500.00",
+      "confidence": 0.93,
+      "source": "ocr"
+    },
+    "income.taxableInterest": {
+      "annotationId": "income.taxableInterest",
+      "value": "1250.50",
+      "confidence": 0.9,
+      "source": "ocr"
+    },
+    "filingStatus.single": {
+      "annotationId": "filingStatus.single",
+      "value": "true",
+      "confidence": 0.99,
+      "source": "ocr"
+    }
+  }
+}

@@ -1,0 +1,115 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.pdf-container {
+  min-height: 100%;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--color-surface-0);
+}
+
+.pdf-stage {
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  line-height: 0;
+}
+
+.pdf-canvas {
+  display: block;
+  background: white;
+}
+
+.overlay-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.annotation-overlay {
+  position: absolute;
+  pointer-events: auto;
+  border: 1.5px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: visible;
+  padding: 1px 2px;
+  box-sizing: border-box;
+}
+
+.annotation-overlay.no-box {
+  border-color: transparent;
+  background: transparent;
+}
+
+.annotation-overlay:hover {
+  border-color: var(--color-accent-hover);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  z-index: 10;
+}
+
+.annotation-overlay.selected {
+  border-color: var(--color-highlight-border);
+  background: color-mix(in srgb, var(--color-highlight) 20%, transparent);
+  box-shadow: 0 0 0 1px var(--color-highlight-border);
+  z-index: 20;
+}
+
+.annotation-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.annotation-meta {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  line-height: 1;
+  padding: 1px 3px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.annotation-meta.confidence {
+  top: -14px;
+  right: 0;
+  background: var(--color-surface-2);
+  color: var(--color-warning);
+  border: 1px solid var(--color-border);
+}
+
+.annotation-meta.binding {
+  bottom: -14px;
+  left: 0;
+  background: var(--color-surface-2);
+  color: var(--color-accent-hover);
+  border: 1px solid var(--color-border);
+}
+
+.annotation-meta.semantic {
+  top: -14px;
+  left: 0;
+  background: var(--color-surface-2);
+  color: var(--color-success);
+  border: 1px solid var(--color-border);
+}

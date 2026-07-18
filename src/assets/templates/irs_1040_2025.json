@@ -1,0 +1,187 @@
+{
+  "formId": "irs_1040_2025",
+  "formName": "U.S. Individual Income Tax Return",
+  "taxYear": 2025,
+  "version": "1.0.0",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "label": "Page 1",
+      "annotations": [
+        {
+          "id": "taxpayer",
+          "type": "group",
+          "label": "Taxpayer",
+          "children": [
+            {
+              "id": "taxpayer.firstName",
+              "type": "field",
+              "label": "First Name",
+              "fieldType": "text",
+              "bindingPath": "taxpayer.firstName",
+              "semanticEntity": "Person.firstName",
+              "validation": { "required": true, "maxLength": 50 },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.08, "y": 0.118, "width": 0.22, "height": 0.018 },
+              "extractionConfidence": 0.97,
+              "reviewStatus": "approved"
+            },
+            {
+              "id": "taxpayer.lastName",
+              "type": "field",
+              "label": "Last Name",
+              "fieldType": "text",
+              "bindingPath": "taxpayer.lastName",
+              "semanticEntity": "Person.lastName",
+              "validation": { "required": true, "maxLength": 50 },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.31, "y": 0.118, "width": 0.28, "height": 0.018 },
+              "extractionConfidence": 0.96,
+              "reviewStatus": "approved"
+            },
+            {
+              "id": "taxpayer.ssn",
+              "type": "field",
+              "label": "SSN",
+              "fieldType": "ssn",
+              "bindingPath": "taxpayer.ssn",
+              "semanticEntity": "Person.ssn",
+              "validation": { "required": true, "pattern": "^\\d{9}$", "message": "SSN must be 9 digits" },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.72, "y": 0.118, "width": 0.2, "height": 0.018 },
+              "extractionConfidence": 0.94,
+              "reviewStatus": "needs_review"
+            },
+            {
+              "id": "taxpayer.dateOfBirth",
+              "type": "field",
+              "label": "Date Of Birth",
+              "fieldType": "date",
+              "bindingPath": "taxpayer.dateOfBirth",
+              "semanticEntity": "Person.dateOfBirth",
+              "validation": { "required": true },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.08, "y": 0.148, "width": 0.18, "height": 0.018 },
+              "extractionConfidence": 0.91,
+              "reviewStatus": "approved"
+            }
+          ]
+        },
+        {
+          "id": "employer",
+          "type": "group",
+          "label": "Employer",
+          "children": [
+            {
+              "id": "employer.companyName",
+              "type": "field",
+              "label": "Company Name",
+              "fieldType": "text",
+              "bindingPath": "employer.companyName",
+              "semanticEntity": "Organization.name",
+              "validation": { "required": false, "maxLength": 100 },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.08, "y": 0.198, "width": 0.42, "height": 0.018 },
+              "extractionConfidence": 0.89,
+              "reviewStatus": "approved"
+            },
+            {
+              "id": "employer.ein",
+              "type": "field",
+              "label": "EIN",
+              "fieldType": "text",
+              "bindingPath": "employer.ein",
+              "semanticEntity": "Organization.ein",
+              "validation": { "required": false, "pattern": "^\\d{2}-\\d{7}$" },
+              "appearance": { "fontSize": 10, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.72, "y": 0.198, "width": 0.2, "height": 0.018 },
+              "extractionConfidence": 0.87,
+              "reviewStatus": "pending"
+            }
+          ]
+        },
+        {
+          "id": "dependents",
+          "type": "collection",
+          "label": "Dependents",
+          "collectionItemLabel": "Dependent",
+          "children": [
+            {
+              "id": "dependents.item.firstName",
+              "type": "field",
+              "label": "First Name",
+              "fieldType": "text",
+              "bindingPath": "dependents[].firstName",
+              "semanticEntity": "Person.firstName",
+              "appearance": { "fontSize": 9, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.08, "y": 0.278, "width": 0.2, "height": 0.016 },
+              "extractionConfidence": 0.85,
+              "reviewStatus": "approved"
+            },
+            {
+              "id": "dependents.item.ssn",
+              "type": "field",
+              "label": "SSN",
+              "fieldType": "ssn",
+              "bindingPath": "dependents[].ssn",
+              "semanticEntity": "Person.ssn",
+              "appearance": { "fontSize": 9, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.42, "y": 0.278, "width": 0.18, "height": 0.016 },
+              "extractionConfidence": 0.82,
+              "reviewStatus": "needs_review"
+            },
+            {
+              "id": "dependents.item.relationship",
+              "type": "field",
+              "label": "Relationship",
+              "fieldType": "text",
+              "bindingPath": "dependents[].relationship",
+              "semanticEntity": "Person.relationship",
+              "appearance": { "fontSize": 9, "textAlign": "left", "color": "#000000" },
+              "boundingBox": { "x": 0.72, "y": 0.278, "width": 0.18, "height": 0.016 },
+              "extractionConfidence": 0.88,
+              "reviewStatus": "approved"
+            }
+          ]
+        },
+        {
+          "id": "income.wages",
+          "type": "field",
+          "label": "Wages, Salaries, Tips",
+          "fieldType": "currency",
+          "bindingPath": "income.wages",
+          "semanticEntity": "Income.wages",
+          "validation": { "required": false },
+          "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
+          "boundingBox": { "x": 0.72, "y": 0.358, "width": 0.2, "height": 0.018 },
+          "extractionConfidence": 0.93,
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "income.taxableInterest",
+          "type": "field",
+          "label": "Taxable Interest",
+          "fieldType": "currency",
+          "bindingPath": "income.taxableInterest",
+          "semanticEntity": "Income.interest",
+          "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
+          "boundingBox": { "x": 0.72, "y": 0.388, "width": 0.2, "height": 0.018 },
+          "extractionConfidence": 0.9,
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "filingStatus.single",
+          "type": "field",
+          "label": "Single Filing Status",
+          "fieldType": "checkbox",
+          "bindingPath": "filingStatus.single",
+          "semanticEntity": "TaxReturn.filingStatus",
+          "appearance": { "fontSize": 10, "textAlign": "center", "color": "#000000" },
+          "boundingBox": { "x": 0.08, "y": 0.088, "width": 0.012, "height": 0.012 },
+          "extractionConfidence": 0.99,
+          "reviewStatus": "approved"
+        }
+      ]
+    }
+  ]
+}

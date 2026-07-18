@@ -1,0 +1,13 @@
+<div class="tree-panel">
+  <div class="panel-header">
+    <span class="panel-title">Annotation Tree</span>
+  </div>
+  <div class="tree-content">
+    @if (treeNodes().length === 0) {
+      <p class="empty-state">No template loaded</p>
+    }
+    @for (page of treeNodes(); track page.id) {
+      <app-tree-node [node]="page" [depth]="0" />
+    }
+  </div>
+</div>
