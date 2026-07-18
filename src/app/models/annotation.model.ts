@@ -5,12 +5,33 @@ export interface BoundingBox {
   height: number;
 }
 
+export interface CoordinateSystem {
+  space: 'normalized';
+  origin: 'top_left';
+  xAxis?: 'left_to_right';
+  yAxis?: 'top_to_bottom';
+}
+
 export interface Appearance {
   fontSize?: number;
   fontFamily?: string;
+  fontWeight?: 'normal' | 'bold';
   textAlign?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'middle' | 'bottom';
   color?: string;
   backgroundColor?: string;
+  overflow?: 'clip' | 'ellipsis' | 'shrink';
+}
+
+export interface FormatOptions {
+  currency?: {
+    currencyCode?: string;
+    locale?: string;
+    minimumFractionDigits?: number;
+  };
+  date?: { pattern?: string };
+  ssn?: { mask?: string; redact?: boolean };
+  checkbox?: { mark?: string };
 }
 
 export interface Validation {
@@ -21,37 +42,56 @@ export interface Validation {
   message?: string;
 }
 
+export interface ValueRef {
+  /** JSONPath subset into nested tax-return data, e.g. $.income.w2Forms[0].wages */
+  path: string;
+}
+
 export type AnnotationType = 'field' | 'group' | 'collection';
+export type FieldType = 'text' | 'currency' | 'ssn' | 'ein' | 'date' | 'checkbox' | 'number';
 export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'needs_review';
 
 export interface AnnotationNode {
   id: string;
   type: AnnotationType;
   label?: string;
-  fieldType?: string;
+  fieldType?: FieldType | string;
+  /** Preferred deep reference into nested tax-return JSON */
+  valueRef?: ValueRef;
+  /**
+   * Legacy / display alias for valueRef.path.
+   * Kept so tooling can show the path string directly.
+   */
   bindingPath?: string;
   semanticEntity?: string;
   validation?: Validation;
   appearance?: Appearance;
+  format?: FormatOptions;
   boundingBox?: BoundingBox;
   extractionConfidence?: number;
   reviewStatus?: ReviewStatus;
   children?: AnnotationNode[];
   page?: number;
   collectionItemLabel?: string;
+  /** Normalized vertical distance between collection rows */
+  rowStride?: number;
 }
 
 export interface AnnotationPage {
   pageNumber: number;
   label: string;
+  widthPoints?: number;
+  heightPoints?: number;
   annotations: AnnotationNode[];
 }
 
 export interface AnnotationTemplate {
+  schemaVersion?: string;
   formId: string;
   formName: string;
   taxYear: number;
   version: string;
+  coordinateSystem?: CoordinateSystem;
   pages: AnnotationPage[];
 }
 
@@ -82,6 +122,7 @@ export interface RenderedAnnotation {
   displayValue: string;
   confidence?: number;
   bindingPath?: string;
+  valuePath?: string;
   semanticEntity?: string;
   appearance?: Appearance;
   fieldType?: string;
@@ -148,3 +189,8 @@ export const DEFAULT_TOGGLES: PlaygroundToggles = {
   semanticMetadata: false,
   bindingPaths: false,
 };
+
+/** Resolve the effective value path for a node. */
+export function getValuePath(node: Pick<AnnotationNode, 'valueRef' | 'bindingPath'>): string | undefined {
+  return node.valueRef?.path ?? node.bindingPath;
+}

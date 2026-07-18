@@ -4,13 +4,16 @@ import {
   AnnotationTemplate,
   BoundingBox,
   FlatAnnotation,
+  FormatOptions,
   PixelBoundingBox,
   RenderedAnnotation,
   RenderOptions,
   TemplateStats,
   TreeNode,
+  getValuePath,
 } from '../models/annotation.model';
 import { ValuesService } from './values.service';
+import { hasCollectionPlaceholder, materializeCollectionPath } from '../utils/path-resolver';
 
 @Injectable({ providedIn: 'root' })
 export class AnnotationRendererService {
@@ -47,10 +50,7 @@ export class AnnotationRendererService {
     };
   }
 
-  renderPage(
-    template: AnnotationTemplate,
-    options: RenderOptions,
-  ): RenderedAnnotation[] {
+  renderPage(template: AnnotationTemplate, options: RenderOptions): RenderedAnnotation[] {
     const flat = this.flattenTemplate(template);
     const rendered: RenderedAnnotation[] = [];
 
@@ -62,9 +62,16 @@ export class AnnotationRendererService {
         continue;
       }
 
+      const valuePath = getValuePath(node);
+      const collectionIndex = node.collectionIndex ?? 0;
+      const concretePath =
+        valuePath && hasCollectionPlaceholder(valuePath)
+          ? materializeCollectionPath(valuePath, collectionIndex)
+          : valuePath;
+
       const pixelBox = this.toPixelBox(node.boundingBox, options.pageWidth, options.pageHeight);
-      const value = this.valuesService.getDisplayValue(node.id);
-      const extracted = this.valuesService.getValue(node.id);
+      const value = this.valuesService.getDisplayValue(node.id, valuePath, collectionIndex);
+      const extracted = this.valuesService.resolveForAnnotation(node.id, valuePath, collectionIndex);
 
       rendered.push({
         id: node.id,
@@ -76,7 +83,8 @@ export class AnnotationRendererService {
         value,
         displayValue: this.formatDisplayValue(value, node),
         confidence: extracted?.confidence ?? node.extractionConfidence,
-        bindingPath: node.bindingPath,
+        bindingPath: concretePath ?? node.bindingPath,
+        valuePath: concretePath,
         semanticEntity: node.semanticEntity,
         appearance: node.appearance,
         fieldType: node.fieldType,
@@ -116,14 +124,28 @@ export class AnnotationRendererService {
         };
         output.push(collectionFlat);
 
+        // Materialize first row in the overlay (index 0). Full multi-row
+        // expansion can use rowStride when a print engine needs every instance.
         this.flattenNodes(
-          node.children,
+          node.children.map((child) => ({
+            ...child,
+            // stash index via a shallow clone consumed below
+          })),
           node.page ?? pageNumber,
           absolutePath,
           depth + 1,
           node.id,
           output,
         );
+
+        // Tag collection children with index 0 for path materialization
+        for (let i = output.length - 1; i >= 0; i--) {
+          if (output[i].parentId === node.id && output[i].collectionIndex === undefined) {
+            output[i] = { ...output[i], collectionIndex: 0 };
+          } else if (output[i].id === node.id) {
+            break;
+          }
+        }
         continue;
       }
 
@@ -150,11 +172,7 @@ export class AnnotationRendererService {
     }
   }
 
-  private buildTreeNodes(
-    nodes: AnnotationNode[],
-    pageNumber: number,
-    depth: number,
-  ): TreeNode[] {
+  private buildTreeNodes(nodes: AnnotationNode[], pageNumber: number, depth: number): TreeNode[] {
     return nodes.map((node) => ({
       id: node.id,
       label: node.label ?? node.id,
@@ -181,15 +199,58 @@ export class AnnotationRendererService {
     if (!value) {
       return '';
     }
-    if (node.fieldType === 'ssn' && value.length === 9) {
+
+    const format = node.format;
+
+    if (node.fieldType === 'checkbox') {
+      const truthy = value === 'true' || value === '1' || value.toLowerCase() === 'yes';
+      return truthy ? (format?.checkbox?.mark ?? 'X') : '';
+    }
+
+    if (node.fieldType === 'ssn' && /^\d{9}$/.test(value)) {
+      if (format?.ssn?.redact) {
+        return `***-**-${value.slice(5)}`;
+      }
       return `${value.slice(0, 3)}-${value.slice(3, 5)}-${value.slice(5)}`;
     }
+
+    if (node.fieldType === 'ein' && /^\d{2}-?\d{7}$/.test(value.replace('-', ''))) {
+      const digits = value.replace(/\D/g, '');
+      return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+    }
+
     if (node.fieldType === 'currency') {
       const num = parseFloat(value);
       if (!isNaN(num)) {
-        return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        return this.formatCurrency(num, format);
       }
     }
+
+    if (node.fieldType === 'date') {
+      return this.formatDate(value, format);
+    }
+
     return value;
+  }
+
+  private formatCurrency(num: number, format?: FormatOptions): string {
+    const locale = format?.currency?.locale ?? 'en-US';
+    const currency = format?.currency?.currencyCode ?? 'USD';
+    const minimumFractionDigits = format?.currency?.minimumFractionDigits ?? 2;
+    return num.toLocaleString(locale, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits,
+    });
+  }
+
+  private formatDate(value: string, format?: FormatOptions): string {
+    const pattern = format?.date?.pattern ?? 'MM/DD/YYYY';
+    const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    if (!iso) {
+      return value;
+    }
+    const [, yyyy, mm, dd] = iso;
+    return pattern.replace('YYYY', yyyy).replace('MM', mm).replace('DD', dd);
   }
 }

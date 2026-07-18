@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instead.com/schemas/annotation-template.schema.json",
+  "title": "Tax Form Annotation Template",
+  "type": "object",
+  "required": ["schemaVersion", "formId", "formName", "taxYear", "version", "coordinateSystem", "pages"],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "formId": { "type": "string", "minLength": 1 },
+    "formName": { "type": "string" },
+    "taxYear": { "type": "integer", "minimum": 2000 },
+    "version": { "type": "string" },
+    "coordinateSystem": {
+      "type": "object",
+      "required": ["space", "origin"],
+      "properties": {
+        "space": { "const": "normalized" },
+        "origin": { "enum": ["top_left"] },
+        "xAxis": { "enum": ["left_to_right"] },
+        "yAxis": { "enum": ["top_to_bottom"] }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/page" }
+    }
+  },
+  "$defs": {
+    "boundingBox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "width": { "type": "number", "minimum": 0, "maximum": 1 },
+        "height": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "valueRef": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "JSONPath subset starting with $. Supports .property and [index] / [] placeholders.",
+          "pattern": "^\\$(\\.[A-Za-z_][A-Za-z0-9_]*|\\[(\\d*|\\*)\\])+$"
+        }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "properties": {
+        "fontFamily": { "type": "string" },
+        "fontSize": { "type": "number", "minimum": 1 },
+        "fontWeight": { "enum": ["normal", "bold"] },
+        "textAlign": { "enum": ["left", "center", "right"] },
+        "verticalAlign": { "enum": ["top", "middle", "bottom"] },
+        "color": { "type": "string" },
+        "backgroundColor": { "type": "string" },
+        "overflow": { "enum": ["clip", "ellipsis", "shrink"] }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "required": { "type": "boolean" },
+        "pattern": { "type": "string" },
+        "minLength": { "type": "integer" },
+        "maxLength": { "type": "integer" },
+        "message": { "type": "string" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "enum": ["field", "group", "collection"] },
+        "label": { "type": "string" },
+        "fieldType": {
+          "enum": ["text", "currency", "ssn", "ein", "date", "checkbox", "number"]
+        },
+        "valueRef": { "$ref": "#/$defs/valueRef" },
+        "semanticEntity": { "type": "string" },
+        "validation": { "$ref": "#/$defs/validation" },
+        "appearance": { "$ref": "#/$defs/appearance" },
+        "boundingBox": { "$ref": "#/$defs/boundingBox" },
+        "page": { "type": "integer", "minimum": 1 },
+        "collectionItemLabel": { "type": "string" },
+        "rowStride": { "type": "number", "minimum": 0 },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node" }
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "required": ["pageNumber", "label", "annotations"],
+      "properties": {
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "label": { "type": "string" },
+        "widthPoints": { "type": "number" },
+        "heightPoints": { "type": "number" },
+        "annotations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node" }
+        }
+      }
+    }
+  }
+}

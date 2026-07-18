@@ -60,6 +60,7 @@ export class TemplateService {
                 type: 'field',
                 label,
                 fieldType,
+                valueRef: metadata.valueRef,
                 bindingPath: metadata.bindingPath,
                 semanticEntity: metadata.semanticEntity,
                 boundingBox: field.boundingBox,
@@ -126,8 +127,34 @@ export class TemplateService {
     this.error.set(null);
   }
 
-  private getFieldMetadata(id: string): { bindingPath: string; semanticEntity: string } {
-    const property = id.slice(id.lastIndexOf('.') + 1);
+  private getFieldMetadata(id: string): {
+    bindingPath: string;
+    valueRef: { path: string };
+    semanticEntity: string;
+  } {
+    const pathMap: Record<string, string> = {
+      'taxpayer.firstName': '$.taxpayer.legal.firstName',
+      'taxpayer.lastName': '$.taxpayer.legal.lastName',
+      'taxpayer.ssn': '$.taxpayer.identifiers.ssn',
+      'spouse.firstName': '$.spouse.legal.firstName',
+      'spouse.lastName': '$.spouse.legal.lastName',
+      'spouse.ssn': '$.spouse.identifiers.ssn',
+      'address.street': '$.address.street',
+      'address.aptNumber': '$.address.aptNumber',
+      'address.city': '$.address.city',
+      'address.state': '$.address.state',
+      'address.zipCode': '$.address.zipCode',
+      'dependents[0].firstName': '$.dependents[0].legal.firstName',
+      'dependents[1].firstName': '$.dependents[1].legal.firstName',
+      'dependents[0].lastName': '$.dependents[0].legal.lastName',
+      'dependents[1].lastName': '$.dependents[1].legal.lastName',
+      'dependents[0].ssn': '$.dependents[0].identifiers.ssn',
+      'dependents[1].ssn': '$.dependents[1].identifiers.ssn',
+      'dependents[0].relationship': '$.dependents[0].relationship',
+      'dependents[1].relationship': '$.dependents[1].relationship',
+    };
+
+    const property = id.includes('.') ? id.slice(id.lastIndexOf('.') + 1) : id;
     const personProperties: Record<string, string> = {
       firstName: 'Person.firstName',
       lastName: 'Person.lastName',
@@ -142,8 +169,10 @@ export class TemplateService {
       zipCode: 'PostalAddress.postalCode',
     };
 
+    const path = pathMap[id] ?? `$.${id}`;
     return {
-      bindingPath: id,
+      bindingPath: path,
+      valueRef: { path },
       semanticEntity: id.startsWith('address.')
         ? addressProperties[property]
         : personProperties[property],

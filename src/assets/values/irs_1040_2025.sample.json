@@ -1,80 +1,85 @@
 {
   "formId": "irs_1040_2025",
   "extractedAt": "2025-03-15T10:30:00Z",
-  "values": {
-    "taxpayer.firstName": {
-      "annotationId": "taxpayer.firstName",
-      "value": "Jane",
-      "confidence": 0.97,
-      "source": "ocr"
+  "taxReturn": {
+    "taxYear": 2025,
+    "filingStatus": {
+      "single": true,
+      "marriedFilingJointly": false,
+      "marriedFilingSeparately": false,
+      "headOfHousehold": false,
+      "qualifyingSurvivingSpouse": false
     },
-    "taxpayer.lastName": {
-      "annotationId": "taxpayer.lastName",
-      "value": "Smith",
-      "confidence": 0.96,
-      "source": "ocr"
+    "taxpayer": {
+      "legal": {
+        "firstName": "Jane",
+        "middleInitial": "A",
+        "lastName": "Smith"
+      },
+      "identifiers": {
+        "ssn": "123456789"
+      },
+      "dateOfBirth": "1985-04-12"
     },
-    "taxpayer.ssn": {
-      "annotationId": "taxpayer.ssn",
-      "value": "123456789",
-      "confidence": 0.94,
-      "source": "ocr"
+    "spouse": {
+      "legal": {
+        "firstName": null,
+        "lastName": null
+      },
+      "identifiers": {
+        "ssn": null
+      }
     },
-    "taxpayer.dateOfBirth": {
-      "annotationId": "taxpayer.dateOfBirth",
-      "value": "1985-04-12",
-      "confidence": 0.91,
-      "source": "ocr"
-    },
-    "employer.companyName": {
-      "annotationId": "employer.companyName",
-      "value": "Acme Corporation",
-      "confidence": 0.89,
-      "source": "ocr"
-    },
-    "employer.ein": {
-      "annotationId": "employer.ein",
-      "value": "12-3456789",
-      "confidence": 0.87,
-      "source": "ocr"
+    "address": {
+      "street": "742 Evergreen Terrace",
+      "aptNumber": "2B",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62704"
     },
     "dependents": [
       {
-        "annotationId": "dependents.item.firstName",
-        "value": "Alex",
-        "confidence": 0.85,
-        "source": "ocr"
+        "legal": {
+          "firstName": "Alex",
+          "lastName": "Smith"
+        },
+        "identifiers": {
+          "ssn": "987654321"
+        },
+        "relationship": "Son"
       },
       {
-        "annotationId": "dependents.item.ssn",
-        "value": "987654321",
-        "confidence": 0.82,
-        "source": "ocr"
-      },
-      {
-        "annotationId": "dependents.item.relationship",
-        "value": "Son",
-        "confidence": 0.88,
-        "source": "ocr"
+        "legal": {
+          "firstName": "Mia",
+          "lastName": "Smith"
+        },
+        "identifiers": {
+          "ssn": "456789123"
+        },
+        "relationship": "Daughter"
       }
     ],
-    "income.wages": {
-      "annotationId": "income.wages",
-      "value": "78500.00",
-      "confidence": 0.93,
-      "source": "ocr"
-    },
-    "income.taxableInterest": {
-      "annotationId": "income.taxableInterest",
-      "value": "1250.50",
-      "confidence": 0.9,
-      "source": "ocr"
-    },
-    "filingStatus.single": {
-      "annotationId": "filingStatus.single",
-      "value": "true",
-      "confidence": 0.99,
-      "source": "ocr"
+    "income": {
+      "w2Forms": [
+        {
+          "employer": {
+            "name": "Acme Corporation",
+            "ein": "12-3456789"
+          },
+          "wages": 78500.0,
+          "federalTaxWithheld": 11240.0
+        }
+      ],
+      "interest": {
+        "taxable": 1250.5,
+        "taxExempt": 0
+      }
     }
+  },
+  "meta": {
+    "taxpayer.firstName": { "confidence": 0.97, "source": "ocr" },
+    "taxpayer.lastName": { "confidence": 0.96, "source": "ocr" },
+    "taxpayer.ssn": { "confidence": 0.94, "source": "ocr" },
+    "income.wages": { "confidence": 0.93, "source": "ocr" }
   }
 }

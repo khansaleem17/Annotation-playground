@@ -4,7 +4,7 @@ import { AnnotationRendererService } from '../../services/annotation-renderer.se
 import { PlaygroundStateService } from '../../services/playground-state.service';
 import { TemplateService } from '../../services/template.service';
 import { ValuesService } from '../../services/values.service';
-import { FlatAnnotation } from '../../models/annotation.model';
+import { FlatAnnotation, getValuePath } from '../../models/annotation.model';
 
 @Component({
   selector: 'app-inspector',
@@ -35,7 +35,16 @@ export class InspectorComponent {
     if (!ann) {
       return '';
     }
-    return this.valuesService.getDisplayValue(ann.id);
+    return this.valuesService.getDisplayValue(
+      ann.id,
+      getValuePath(ann),
+      ann.collectionIndex ?? 0,
+    );
+  });
+
+  readonly valuePath = computed(() => {
+    const ann = this.selectedAnnotation();
+    return ann ? getValuePath(ann) : undefined;
   });
 
   readonly extractedConfidence = computed(() => {
@@ -43,7 +52,11 @@ export class InspectorComponent {
     if (!ann) {
       return undefined;
     }
-    const extracted = this.valuesService.getValue(ann.id);
+    const extracted = this.valuesService.resolveForAnnotation(
+      ann.id,
+      getValuePath(ann),
+      ann.collectionIndex ?? 0,
+    );
     return extracted?.confidence ?? ann.extractionConfidence;
   });
 
