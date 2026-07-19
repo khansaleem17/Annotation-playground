@@ -17,7 +17,17 @@ A portable data structure for annotating fields/boxes on U.S. tax forms, with a 
 | **Path resolver** (nested JSONPath) | [`src/app/utils/path-resolver.ts`](src/app/utils/path-resolver.ts) |
 | **Example Form 1040 template** | [`src/assets/templates/irs_1040_2025.json`](src/assets/templates/irs_1040_2025.json) |
 | **Nested sample tax data** | [`src/assets/values/irs_1040_2025.sample.json`](src/assets/values/irs_1040_2025.sample.json) |
+| **Sample Form 1040 PDF** | [`samples/f1040.pdf`](samples/f1040.pdf) |
+| **Demo walkthrough** | [`docs/demo/walkthrough.mp4`](docs/demo/walkthrough.mp4) |
 | **Reference overlay app** | Angular playground (this repo) |
+
+---
+
+## Demo walkthrough
+
+<video src="docs/demo/walkthrough.mp4" controls width="100%"></video>
+
+[Download / open the demo video](docs/demo/walkthrough.mp4)
 
 ---
 
@@ -40,6 +50,11 @@ A portable data structure for annotating fields/boxes on U.S. tax forms, with a 
 
 A print engine loads the form PDF, the template, and proprietary nested data, then for each field: resolve path → format → draw inside the box.
 
+See also in [`docs/SPECIFICATION.md`](docs/SPECIFICATION.md):
+
+- **§2.1 Key decisions** — why normalized coords, JSONPath, and a two-document model  
+- **§14 Future enhancements** — conditional visibility, multi-entity packs, visual authoring, and more  
+
 ---
 
 ## Quick start (demo)
@@ -50,6 +65,14 @@ npm start
 ```
 
 Open [http://localhost:4200](http://localhost:4200), upload an **IRS Form 1040 (2025)** PDF, and explore overlays, the annotation tree, and the inspector.
+
+### Sample form (if you don’t have one)
+
+Use the included blank IRS Form 1040 (2025) for testing:
+
+[`samples/f1040.pdf`](samples/f1040.pdf)
+
+Download that file, drag it onto the upload screen, and the playground will detect the form and render annotations.
 
 ### Demo controls
 
@@ -89,6 +112,9 @@ Resolver implementation: `src/app/utils/path-resolver.ts`.
 docs/
   SPECIFICATION.md          # Full written spec (primary assessment doc)
   schema/                   # JSON Schema
+  demo/walkthrough.mp4      # Screen recording of the playground
+samples/
+  f1040.pdf                 # Sample IRS Form 1040 (2025) for testing
 src/app/
   models/                   # TypeScript interfaces
   utils/path-resolver.ts    # Nested path resolution
