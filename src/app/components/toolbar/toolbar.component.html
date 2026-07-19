@@ -6,11 +6,33 @@
 
   <div class="h-5 w-px bg-border mx-2"></div>
 
-  <div class="flex items-center gap-0.5">
+  <div class="flex items-center gap-0.5 view-switch">
+    <button
+      type="button"
+      class="toolbar-btn"
+      [class.active]="state.view() === 'overlay'"
+      (click)="setView('overlay')"
+    >
+      Form Overlay
+    </button>
+    <button
+      type="button"
+      class="toolbar-btn"
+      [class.active]="state.view() === 'json'"
+      (click)="setView('json')"
+    >
+      Extracted JSON
+    </button>
+  </div>
+
+  <div class="h-5 w-px bg-border mx-2"></div>
+
+  <div class="flex items-center gap-0.5" [class.opacity-40]="state.view() === 'json'">
     <button
       type="button"
       class="toolbar-btn"
       [class.active]="state.toggles().boundingBoxes"
+      [disabled]="state.view() === 'json'"
       (click)="toggle('boundingBoxes')"
     >
       Bounding Boxes
@@ -19,6 +41,7 @@
       type="button"
       class="toolbar-btn"
       [class.active]="state.toggles().values"
+      [disabled]="state.view() === 'json'"
       (click)="toggle('values')"
     >
       Values
@@ -27,6 +50,7 @@
       type="button"
       class="toolbar-btn"
       [class.active]="state.toggles().confidence"
+      [disabled]="state.view() === 'json'"
       (click)="toggle('confidence')"
     >
       Confidence
@@ -35,6 +59,7 @@
       type="button"
       class="toolbar-btn"
       [class.active]="state.toggles().semanticMetadata"
+      [disabled]="state.view() === 'json'"
       (click)="toggle('semanticMetadata')"
     >
       Semantic Metadata
@@ -43,6 +68,7 @@
       type="button"
       class="toolbar-btn"
       [class.active]="state.toggles().bindingPaths"
+      [disabled]="state.view() === 'json'"
       (click)="toggle('bindingPaths')"
     >
       Binding Paths
@@ -51,18 +77,37 @@
 
   <div class="h-5 w-px bg-border mx-2"></div>
 
-  <div class="flex items-center gap-0.5">
-    <button type="button" class="toolbar-btn icon-btn" title="Zoom In" (click)="zoomIn.emit()">
+  <div class="flex items-center gap-0.5" [class.opacity-40]="state.view() === 'json'">
+    <button
+      type="button"
+      class="toolbar-btn icon-btn"
+      title="Zoom In"
+      [disabled]="state.view() === 'json'"
+      (click)="zoomIn.emit()"
+    >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
     </button>
-    <button type="button" class="toolbar-btn icon-btn" title="Zoom Out" (click)="zoomOut.emit()">
+    <button
+      type="button"
+      class="toolbar-btn icon-btn"
+      title="Zoom Out"
+      [disabled]="state.view() === 'json'"
+      (click)="zoomOut.emit()"
+    >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
       </svg>
     </button>
-    <button type="button" class="toolbar-btn" (click)="fitWidth.emit()">Fit Width</button>
+    <button
+      type="button"
+      class="toolbar-btn"
+      [disabled]="state.view() === 'json'"
+      (click)="fitWidth.emit()"
+    >
+      Fit Width
+    </button>
   </div>
 
   <div class="flex-1"></div>

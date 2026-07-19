@@ -37,19 +37,25 @@
       (fitWidth)="onFitWidth()"
     />
 
-    <div class="playground-body">
-      <aside class="panel-left">
-        <app-annotation-tree />
-      </aside>
+    @if (state.view() === 'json') {
+      <div class="playground-body json-body">
+        <app-extracted-json />
+      </div>
+    } @else {
+      <div class="playground-body">
+        <aside class="panel-left">
+          <app-annotation-tree />
+        </aside>
 
-      <main class="panel-center">
-        <app-pdf-viewer [pageNumber]="1" />
-      </main>
+        <main class="panel-center">
+          <app-pdf-viewer [pageNumber]="1" />
+        </main>
 
-      <aside class="panel-right">
-        <app-inspector />
-      </aside>
-    </div>
+        <aside class="panel-right">
+          <app-inspector />
+        </aside>
+      </div>
+    }
 
     <app-status-bar />
   </div>

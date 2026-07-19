@@ -1,0 +1,40 @@
+<div class="json-page">
+  <header class="json-header">
+    <div>
+      <h2 class="json-title">Extracted JSON</h2>
+      <p class="json-subtitle">
+        Nested tax-return values resolved from
+        <span class="mono">{{ state.fileName() ?? 'the uploaded form' }}</span>
+      </p>
+    </div>
+
+    <div class="json-actions">
+      <div class="tab-group">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'taxReturn'"
+          (click)="setTab('taxReturn')"
+        >
+          Tax Return
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'full'"
+          (click)="setTab('full')"
+        >
+          Full Document
+        </button>
+      </div>
+
+      <button type="button" class="copy-btn" (click)="copyJson()">
+        {{ copied() ? 'Copied' : 'Copy JSON' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="json-panel">
+    <pre class="json-pre">{{ jsonText() }}</pre>
+  </div>
+</div>

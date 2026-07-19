@@ -5,6 +5,7 @@ import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.compo
 import { AnnotationTreeComponent } from '../../components/annotation-tree/annotation-tree.component';
 import { InspectorComponent } from '../../components/inspector/inspector.component';
 import { StatusBarComponent } from '../../components/status-bar/status-bar.component';
+import { ExtractedJsonComponent } from '../../components/extracted-json/extracted-json.component';
 import { PdfService } from '../../services/pdf.service';
 import { FormDetectionService } from '../../services/form-detection.service';
 import { TemplateRegistryService } from '../../services/template-registry.service';
@@ -27,6 +28,7 @@ const STAGE_DELAY_MS = 450;
     AnnotationTreeComponent,
     InspectorComponent,
     StatusBarComponent,
+    ExtractedJsonComponent,
   ],
   templateUrl: './playground.component.html',
   styleUrl: './playground.component.css',

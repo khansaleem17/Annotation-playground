@@ -32,3 +32,15 @@
 .icon-btn {
   padding: 0.375rem;
 }
+
+.toolbar-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.view-switch {
+  padding: 0.125rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-2);
+}

@@ -7,6 +7,8 @@ import {
   TemplateStats,
 } from '../models/annotation.model';
 
+export type PlaygroundView = 'overlay' | 'json';
+
 @Injectable({ providedIn: 'root' })
 export class PlaygroundStateService {
   readonly selectedAnnotationId = signal<string | null>(null);
@@ -17,11 +19,16 @@ export class PlaygroundStateService {
   readonly statusMessage = signal('Ready');
   readonly processingStages = signal<ProcessingStage[]>([]);
   readonly isProcessing = signal(false);
+  readonly view = signal<PlaygroundView>('overlay');
 
   readonly selectedId = computed(() => this.selectedAnnotationId());
 
   selectAnnotation(id: string | null): void {
     this.selectedAnnotationId.set(id);
+  }
+
+  setView(view: PlaygroundView): void {
+    this.view.set(view);
   }
 
   toggle(key: keyof PlaygroundToggles): void {
@@ -65,5 +72,6 @@ export class PlaygroundStateService {
     this.statusMessage.set('Ready');
     this.processingStages.set([]);
     this.isProcessing.set(false);
+    this.view.set('overlay');
   }
 }

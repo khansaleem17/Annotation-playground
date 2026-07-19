@@ -1,5 +1,5 @@
 import { Component, inject, output } from '@angular/core';
-import { PlaygroundStateService } from '../../services/playground-state.service';
+import { PlaygroundStateService, PlaygroundView } from '../../services/playground-state.service';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
@@ -18,5 +18,9 @@ export class ToolbarComponent {
 
   toggle(key: 'boundingBoxes' | 'values' | 'confidence' | 'semanticMetadata' | 'bindingPaths'): void {
     this.state.toggle(key);
+  }
+
+  setView(view: PlaygroundView): void {
+    this.state.setView(view);
   }
 }
