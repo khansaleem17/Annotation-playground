@@ -24,21 +24,31 @@ A portable data structure for annotating fields/boxes on U.S. tax forms, with a 
 
 ## Demo screenshots
 
-Form overlay with values printed into each annotated box, plus the inspector for a selected field:
+Upload screen (light / dark):
 
-![Form overlay — first name selected](docs/demo/01-form-overlay.png)
+![Landing — light](docs/demo/01-landing-light.png)
 
-Annotation tree, PDF overlays, and inspector showing JSONPath / geometry / confidence:
+![Landing — dark](docs/demo/02-landing-dark.png)
 
-![Annotation inspector — last name](docs/demo/02-annotation-inspector.png)
+Processing pipeline after upload:
 
-Extracted nested tax-return JSON resolved from the uploaded PDF:
+![Processing pipeline](docs/demo/03-processing-pipeline.png)
 
-![Extracted JSON view](docs/demo/03-extracted-json.png)
+Form overlay with annotation tree:
 
-Bounding boxes and printed values across taxpayer, address, dependents, and income:
+![Form overlay — dark](docs/demo/04-form-overlay-dark.png)
 
-![Form overlay with bounding boxes](docs/demo/04-bounding-boxes.png)
+![Form overlay — light](docs/demo/05-form-overlay-light.png)
+
+Inspector with JSONPath, geometry, and confidence:
+
+![Inspector — light](docs/demo/06-inspector-light.png)
+
+![Inspector — dark](docs/demo/07-inspector-dark.png)
+
+Extracted nested tax-return JSON:
+
+![Extracted JSON](docs/demo/08-extracted-json.png)
 
 ---
 

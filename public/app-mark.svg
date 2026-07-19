@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Form page -->
+  <rect x="5" y="3" width="18" height="26" rx="2.5" stroke="#24282C" stroke-width="1.75"/>
+  <!-- Field rows -->
+  <rect x="9" y="8" width="10" height="2.5" rx="0.75" fill="#24282C" fill-opacity="0.22"/>
+  <rect x="9" y="13.5" width="12" height="3.5" rx="0.75" stroke="#6da012" stroke-width="1.75"/>
+  <rect x="9" y="20" width="7" height="2.5" rx="0.75" fill="#24282C" fill-opacity="0.22"/>
+  <!-- Corner selection handle -->
+  <circle cx="21" cy="17" r="1.5" fill="#6da012"/>
+</svg>
