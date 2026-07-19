@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
+import { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -29,6 +29,7 @@ export class PdfService {
   readonly error = signal<string | null>(null);
 
   private pdfData: ArrayBuffer | null = null;
+  private activeRenderTask: RenderTask | null = null;
 
   async loadPdf(data: ArrayBuffer): Promise<PDFDocumentProxy> {
     this.loading.set(true);
@@ -62,6 +63,10 @@ export class PdfService {
       throw new Error('No PDF loaded');
     }
 
+    // Cancel any in-flight paint so a stale lower-scale render cannot resize
+    // the canvas after a newer fit/zoom render has already drawn.
+    this.cancelActiveRender();
+
     const page = await doc.getPage(pageNumber);
     const viewport = page.getViewport({ scale });
     const context = canvas.getContext('2d');
@@ -75,12 +80,21 @@ export class PdfService {
 
     // Disable native AcroForm painting — we overlay values from the annotation spec.
     // Avoids missing-standard-font failures on some filled IRS PDFs.
-    await page.render({
+    const task = page.render({
       canvasContext: context,
       viewport,
       canvas,
       annotationMode: 0, // AnnotationMode.DISABLE
-    }).promise;
+    });
+    this.activeRenderTask = task;
+
+    try {
+      await task.promise;
+    } finally {
+      if (this.activeRenderTask === task) {
+        this.activeRenderTask = null;
+      }
+    }
 
     return {
       width: viewport.width,
@@ -109,17 +123,16 @@ export class PdfService {
     this.scale.update((s) => Math.max(s - 0.15, 0.25));
   }
 
-  fitWidth(containerWidth: number): void {
+  async fitWidth(containerWidth: number): Promise<void> {
     const doc = this.pdfDocument();
     if (!doc || containerWidth <= 0) {
       return;
     }
 
-    doc.getPage(this.currentPage()).then((page) => {
-      const viewport = page.getViewport({ scale: 1 });
-      const fitScale = (containerWidth - 48) / viewport.width;
-      this.scale.set(Math.max(0.25, Math.min(fitScale, 3)));
-    });
+    const page = await doc.getPage(this.currentPage());
+    const viewport = page.getViewport({ scale: 1 });
+    const fitScale = (containerWidth - 48) / viewport.width;
+    this.scale.set(Math.max(0.25, Math.min(fitScale, 3)));
   }
 
   setScale(scale: number): void {
@@ -190,6 +203,7 @@ export class PdfService {
   }
 
   clear(): void {
+    this.cancelActiveRender();
     const doc = this.pdfDocument();
     if (doc) {
       void doc.cleanup();
@@ -199,6 +213,18 @@ export class PdfService {
     this.currentPage.set(1);
     this.scale.set(1);
     this.error.set(null);
+  }
+
+  private cancelActiveRender(): void {
+    if (!this.activeRenderTask) {
+      return;
+    }
+    try {
+      this.activeRenderTask.cancel();
+    } catch {
+      // Already finished or cancelled.
+    }
+    this.activeRenderTask = null;
   }
 
   private getFieldId(name: string): string {

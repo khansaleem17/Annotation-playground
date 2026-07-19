@@ -126,10 +126,7 @@ export class PlaygroundPage implements OnInit {
 
       this.state.setStatus('Ready');
       this.showPlayground.set(true);
-
-      // Fit width after the viewer mounts; retry once in case layout isn't ready.
-      setTimeout(() => this.pdfViewer()?.fitWidth(), 50);
-      setTimeout(() => this.pdfViewer()?.fitWidth(), 250);
+      // PdfViewer fits to its container via ResizeObserver after mount.
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Processing failed';
       this.processingError.set(message);
