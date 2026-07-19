@@ -1,4 +1,4 @@
-# Instead Engineer Assessment — Tax Form Annotation Spec
+# Tax Form Annotation Spec
 
 A portable data structure for annotating fields/boxes on U.S. tax forms, with a reference Angular playground that prints nested tax-return values into each box.
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://instead.com/schemas/annotation-template.schema.json",
+  "$id": "https://annotation-playground.local/schemas/annotation-template.schema.json",
   "title": "Tax Form Annotation Template",
   "type": "object",
   "required": ["schemaVersion", "formId", "formName", "taxYear", "version", "coordinateSystem", "pages"],

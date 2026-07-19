@@ -1,6 +1,5 @@
 # Tax Form Annotation Specification
 
-**Instead Engineer Technical Assessment**  
 **Schema version:** `1.0.0`  
 **Author:** Saleem Khan
 
