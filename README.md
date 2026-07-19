@@ -2,7 +2,6 @@
 
 A portable data structure for annotating fields/boxes on U.S. tax forms, with a reference Angular playground that prints nested tax-return values into each box.
 
-**Company:** [Instead](https://www.instead.com)  
 **Assessment focus:** positioning · formatting · deep value references
 
 ---
@@ -18,16 +17,28 @@ A portable data structure for annotating fields/boxes on U.S. tax forms, with a 
 | **Example Form 1040 template** | [`src/assets/templates/irs_1040_2025.json`](src/assets/templates/irs_1040_2025.json) |
 | **Nested sample tax data** | [`src/assets/values/irs_1040_2025.sample.json`](src/assets/values/irs_1040_2025.sample.json) |
 | **Sample Form 1040 PDF** | [`samples/f1040.pdf`](samples/f1040.pdf) |
-| **Demo walkthrough** | [`docs/demo/walkthrough.mp4`](docs/demo/walkthrough.mp4) |
+| **Demo screenshots** | [`docs/demo/`](docs/demo/) |
 | **Reference overlay app** | Angular playground (this repo) |
 
 ---
 
-## Demo walkthrough
+## Demo screenshots
 
-<video src="docs/demo/walkthrough.mp4" controls width="100%"></video>
+Form overlay with values printed into each annotated box, plus the inspector for a selected field:
 
-[Download / open the demo video](docs/demo/walkthrough.mp4)
+![Form overlay — first name selected](docs/demo/01-form-overlay.png)
+
+Annotation tree, PDF overlays, and inspector showing JSONPath / geometry / confidence:
+
+![Annotation inspector — last name](docs/demo/02-annotation-inspector.png)
+
+Extracted nested tax-return JSON resolved from the uploaded PDF:
+
+![Extracted JSON view](docs/demo/03-extracted-json.png)
+
+Bounding boxes and printed values across taxpayer, address, dependents, and income:
+
+![Form overlay with bounding boxes](docs/demo/04-bounding-boxes.png)
 
 ---
 
@@ -112,7 +123,7 @@ Resolver implementation: `src/app/utils/path-resolver.ts`.
 docs/
   SPECIFICATION.md          # Full written spec (primary assessment doc)
   schema/                   # JSON Schema
-  demo/walkthrough.mp4      # Screen recording of the playground
+  demo/                     # Playground screenshots
 samples/
   f1040.pdf                 # Sample IRS Form 1040 (2025) for testing
 src/app/
