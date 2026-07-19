@@ -104,15 +104,15 @@ export class PlaygroundPage implements OnInit {
       });
 
       await this.runStage('values', async () => {
+        this.state.setStatus('Loading sample extracted values…');
+        await this.valuesService.loadValues(assets.valuesPath);
+
         this.state.setStatus('Reading form values…');
         pdfFormFields = await this.pdfService.getFormFields();
         this.templateService.applyPdfFormGeometry(formId, pdfFormFields);
-        const loadedFormValues = this.valuesService.setPdfFormValues(formId, pdfFormFields);
-
-        if (!loadedFormValues) {
-          this.state.setStatus('Loading sample extracted values…');
-          await this.valuesService.loadValues(assets.valuesPath);
-        }
+        // Overlay PDF AcroForm values on top of the sample so income (and other
+        // demo branches) still resolve when the uploaded PDF only fills header fields.
+        this.valuesService.setPdfFormValues(formId, pdfFormFields);
       });
 
       await this.runStage('render', async () => {

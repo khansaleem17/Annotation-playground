@@ -30,6 +30,8 @@ const PDF_FIELD_PATHS: Record<string, string> = {
   f1_40: '$.dependents[1].identifiers.ssn',
   f1_43: '$.dependents[0].relationship',
   f1_44: '$.dependents[1].relationship',
+  f1_47: '$.income.w2Forms[0].wages',
+  f1_59: '$.income.interest.taxable',
 };
 
 /** Annotation id → nested path (for sample / PDF overlays). */
@@ -79,9 +81,17 @@ export class ValuesService {
     return doc;
   }
 
+  /**
+   * Overlay AcroForm values onto the current document (or a fresh one).
+   * When a sample document is already loaded, PDF values win for mapped
+   * fields while unmapped branches (e.g. income employer) are preserved.
+   */
   setPdfFormValues(formId: string, fields: PdfFormField[]): boolean {
     const extractedValues: Record<string, ExtractedValue> = {};
-    const taxReturn: Record<string, unknown> = {};
+    const existing = this.valuesDocument();
+    const taxReturn: Record<string, unknown> = existing?.taxReturn
+      ? (structuredClone(existing.taxReturn) as Record<string, unknown>)
+      : {};
 
     for (const field of fields) {
       const path = PDF_FIELD_PATHS[field.id];
@@ -90,14 +100,15 @@ export class ValuesService {
       }
       const annotationId =
         Object.entries(ANNOTATION_PATHS).find(([, p]) => p === path)?.[0] ?? field.id;
+      const value = this.coercePdfValue(path, field.value);
 
       extractedValues[annotationId] = {
         annotationId,
-        value: field.value,
+        value,
         confidence: 1,
         source: 'pdf-form',
       };
-      this.assignByPath(taxReturn, path, field.value);
+      this.assignByPath(taxReturn, path, value);
     }
 
     if (Object.keys(extractedValues).length === 0) {
@@ -108,7 +119,8 @@ export class ValuesService {
       formId,
       extractedAt: new Date().toISOString(),
       taxReturn: taxReturn as ExtractedValuesDocument['taxReturn'],
-      values: extractedValues,
+      values: { ...(existing?.values ?? {}), ...extractedValues },
+      meta: existing?.meta,
     });
     return true;
   }
@@ -234,6 +246,22 @@ export class ValuesService {
 
   private getMeta(annotationId: string): FieldMeta | undefined {
     return this.valuesDocument()?.meta?.[annotationId];
+  }
+
+  /** Coerce currency / numeric AcroForm strings into numbers when appropriate. */
+  private coercePdfValue(path: string, raw: string): string | number {
+    const currencyPaths = new Set([
+      '$.income.w2Forms[0].wages',
+      '$.income.interest.taxable',
+    ]);
+    if (!currencyPaths.has(path)) {
+      return raw;
+    }
+    const normalized = raw.replace(/[$,\s]/g, '');
+    if (normalized === '' || Number.isNaN(Number(normalized))) {
+      return raw;
+    }
+    return Number(normalized);
   }
 
   /** Assign a leaf value into a nested object given a concrete JSONPath. */

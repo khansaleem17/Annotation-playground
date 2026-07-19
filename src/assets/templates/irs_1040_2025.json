@@ -169,37 +169,44 @@
           ]
         },
         {
-          "id": "income.wages",
-          "type": "field",
-          "label": "Wages, Salaries, Tips",
-          "fieldType": "currency",
-          "valueRef": { "path": "$.income.w2Forms[0].wages" },
-          "bindingPath": "$.income.w2Forms[0].wages",
-          "semanticEntity": "Income.wages",
-          "validation": { "required": false },
-          "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
-          "format": {
-            "currency": { "currencyCode": "USD", "locale": "en-US", "minimumFractionDigits": 2 }
-          },
-          "boundingBox": { "x": 0.72, "y": 0.358, "width": 0.2, "height": 0.018 },
-          "extractionConfidence": 0.93,
-          "reviewStatus": "approved"
-        },
-        {
-          "id": "income.taxableInterest",
-          "type": "field",
-          "label": "Taxable Interest",
-          "fieldType": "currency",
-          "valueRef": { "path": "$.income.interest.taxable" },
-          "bindingPath": "$.income.interest.taxable",
-          "semanticEntity": "Income.interest",
-          "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
-          "format": {
-            "currency": { "currencyCode": "USD", "locale": "en-US", "minimumFractionDigits": 2 }
-          },
-          "boundingBox": { "x": 0.72, "y": 0.388, "width": 0.2, "height": 0.018 },
-          "extractionConfidence": 0.9,
-          "reviewStatus": "approved"
+          "id": "income",
+          "type": "group",
+          "label": "Income",
+          "children": [
+            {
+              "id": "income.wages",
+              "type": "field",
+              "label": "Wages, Salaries, Tips",
+              "fieldType": "currency",
+              "valueRef": { "path": "$.income.w2Forms[0].wages" },
+              "bindingPath": "$.income.w2Forms[0].wages",
+              "semanticEntity": "Income.wages",
+              "validation": { "required": false },
+              "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
+              "format": {
+                "currency": { "currencyCode": "USD", "locale": "en-US", "minimumFractionDigits": 2 }
+              },
+              "boundingBox": { "x": 0.72, "y": 0.358, "width": 0.2, "height": 0.018 },
+              "extractionConfidence": 0.93,
+              "reviewStatus": "approved"
+            },
+            {
+              "id": "income.taxableInterest",
+              "type": "field",
+              "label": "Taxable Interest",
+              "fieldType": "currency",
+              "valueRef": { "path": "$.income.interest.taxable" },
+              "bindingPath": "$.income.interest.taxable",
+              "semanticEntity": "Income.interest",
+              "appearance": { "fontSize": 10, "textAlign": "right", "color": "#000000" },
+              "format": {
+                "currency": { "currencyCode": "USD", "locale": "en-US", "minimumFractionDigits": 2 }
+              },
+              "boundingBox": { "x": 0.72, "y": 0.388, "width": 0.2, "height": 0.018 },
+              "extractionConfidence": 0.9,
+              "reviewStatus": "approved"
+            }
+          ]
         },
         {
           "id": "filingStatus.single",

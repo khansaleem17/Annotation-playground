@@ -66,6 +66,8 @@ export class TemplateService {
       ['f1_40', 'dependents[1].ssn', 'Dependent 2 SSN', 'ssn'],
       ['f1_43', 'dependents[0].relationship', 'Dependent 1 Relationship', 'text'],
       ['f1_44', 'dependents[1].relationship', 'Dependent 2 Relationship', 'text'],
+      ['f1_47', 'income.wages', 'Wages, Salaries, Tips', 'currency'],
+      ['f1_59', 'income.taxableInterest', 'Taxable Interest', 'currency'],
     ];
 
     const createField = (
@@ -79,6 +81,7 @@ export class TemplateService {
         return null;
       }
       const metadata = this.getFieldMetadata(id);
+      const isCurrency = fieldType === 'currency';
       return {
         id,
         type: 'field',
@@ -88,7 +91,14 @@ export class TemplateService {
         bindingPath: metadata.bindingPath,
         semanticEntity: metadata.semanticEntity,
         boundingBox: field.boundingBox,
-        appearance: { fontSize: 9, textAlign: 'left', color: '#000000' },
+        appearance: {
+          fontSize: isCurrency ? 10 : 9,
+          textAlign: isCurrency ? 'right' : 'left',
+          color: '#000000',
+        },
+        format: isCurrency
+          ? { currency: { currencyCode: 'USD', locale: 'en-US', minimumFractionDigits: 2 } }
+          : undefined,
         extractionConfidence: 1,
         reviewStatus: 'approved',
       };
@@ -104,6 +114,7 @@ export class TemplateService {
     const spouseChildren = groupChildren(['spouse.']);
     const addressChildren = groupChildren(['address.']);
     const dependentChildren = groupChildren(['dependents[']);
+    const incomeChildren = groupChildren(['income.']);
 
     // Prefer PDF-derived fields when available; otherwise keep template nodes
     // so bounding boxes from the static annotation spec still render.
@@ -131,8 +142,11 @@ export class TemplateService {
     const existingSpouse = page.annotations.find((node) => node.id === 'spouse');
     const existingAddress = page.annotations.find((node) => node.id === 'address');
     const existingDependents = page.annotations.find((node) => node.id === 'dependents');
+    const existingIncome = page.annotations.find((node) => node.id === 'income');
     const otherNodes = page.annotations.filter(
-      (node) => !['taxpayer', 'spouse', 'address', 'dependents'].includes(node.id),
+      (node) =>
+        !['taxpayer', 'spouse', 'address', 'dependents', 'income'].includes(node.id) &&
+        !node.id.startsWith('income.'),
     );
 
     const updatedPage = {
@@ -142,6 +156,7 @@ export class TemplateService {
         keepOrReplace(existingSpouse, 'spouse', 'Spouse', spouseChildren),
         keepOrReplace(existingAddress, 'address', 'Address', addressChildren),
         keepOrReplace(existingDependents, 'dependents', 'Dependents', dependentChildren, 'collection'),
+        keepOrReplace(existingIncome, 'income', 'Income', incomeChildren),
         ...otherNodes,
       ],
     };
@@ -184,6 +199,8 @@ export class TemplateService {
       'dependents[1].ssn': '$.dependents[1].identifiers.ssn',
       'dependents[0].relationship': '$.dependents[0].relationship',
       'dependents[1].relationship': '$.dependents[1].relationship',
+      'income.wages': '$.income.w2Forms[0].wages',
+      'income.taxableInterest': '$.income.interest.taxable',
     };
 
     const property = id.includes('.') ? id.slice(id.lastIndexOf('.') + 1) : id;
@@ -200,14 +217,25 @@ export class TemplateService {
       state: 'PostalAddress.addressRegion',
       zipCode: 'PostalAddress.postalCode',
     };
+    const incomeProperties: Record<string, string> = {
+      wages: 'Income.wages',
+      taxableInterest: 'Income.interest',
+    };
 
     const path = pathMap[id] ?? `$.${id}`;
+    let semanticEntity: string | undefined;
+    if (id.startsWith('address.')) {
+      semanticEntity = addressProperties[property];
+    } else if (id.startsWith('income.')) {
+      semanticEntity = incomeProperties[property];
+    } else {
+      semanticEntity = personProperties[property];
+    }
+
     return {
       bindingPath: path,
       valueRef: { path },
-      semanticEntity: id.startsWith('address.')
-        ? addressProperties[property]
-        : personProperties[property],
+      semanticEntity: semanticEntity ?? id,
     };
   }
 }

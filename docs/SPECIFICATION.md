@@ -45,6 +45,19 @@ A separate rendering application (proprietary or open) consumes:
 | Portable | JSON templates + TypeScript interfaces + JSON Schema |
 | Extensible | New forms = new template files; renderer stays unchanged |
 
+### 2.1 Key decisions (and why)
+
+| Decision | Chose | Rejected / deferred | Why |
+|----------|-------|---------------------|-----|
+| Coordinates | **Normalized 0–1**, origin top-left | Absolute PDF points or raw pixels | Templates stay stable across zoom, DPI, and print size; renderer does a trivial multiply |
+| Value binding | **JSONPath subset** (`$.a.b[0].c`) into nested `taxReturn` | Flat key map only (`income.wages`) | Tax data is naturally nested; the assignment requires deep references without forcing a flatten step |
+| Template vs data | **Two documents** — reusable template + per-return data | Embedding values inside the template | Same Form 1040 layout serves thousands of clients; only data changes |
+| Delivery format | **JSON + TypeScript interfaces + JSON Schema** | XML-only or classes without examples | JSON is easy to author/diff; TS types guide implementers; Schema validates templates |
+| Scope of v1 | **Print-oriented annotation** (position, format, path) | Full OCR pipeline, tax calc, MeF e-file | Matches the brief: annotate boxes and print proprietary values; keeps the deliverable clean |
+| Demo app | Thin Angular playground that consumes the spec | Spec-only with no runner | Proves someone can build a print overlay from the documentation alone |
+
+These choices favor **portability and cleanliness** over maximizing features in v1. Conditional UI, multi-entity packs, and visual authoring are called out as future enhancements (§14) rather than baked into the MVP.
+
 ---
 
 ## 3. Document Types
@@ -477,7 +490,52 @@ No renderer changes required if the new form uses the same coordinate system and
 
 ---
 
-## 14. Summary
+## 14. Future Enhancements
+
+The current spec is intentionally minimal so a print engine can adopt it quickly. Natural next steps, without breaking the core model:
+
+### 14.1 Conditional visibility & required-when
+
+Show or require fields based on other answers (e.g. spouse block only when filing status is married filing jointly).
+
+```json
+{
+  "visibility": {
+    "dependsOn": "$.filingStatus.marriedFilingJointly",
+    "equals": true
+  }
+}
+```
+
+### 14.2 Richer collection layout
+
+Auto-expand repeating rows with `rowStride`, overflow to continuation schedules, and per-instance bounding boxes for more than two dependents.
+
+### 14.3 Multi-form / multi-entity packs
+
+Compose linked templates for 1040 + Schedules + K-1s, and for multi-entity returns (1120-S, 1065, 1041) sharing one nested client graph.
+
+### 14.4 Collaborative review metadata
+
+First-class review workflow on each field: confidence, reviewer, comments, approve/reject — already sketched via `reviewStatus` / `extractionConfidence`, expandable to audit trails.
+
+### 14.5 Locale & accessibility formatting
+
+Per-jurisdiction number/date masks, screen-reader labels, and high-contrast print profiles for taxpayer-facing packets.
+
+### 14.6 Visual authoring tooling
+
+A drag-to-draw annotator that writes valid template JSON (validated by the JSON Schema), so tax ops can add forms without hand-editing coordinates.
+
+### 14.7 Bidirectional binding
+
+Today the path is read → print. A future mode could write edited overlay values back into the nested `taxReturn` object for prep workflows.
+
+These enhancements layer onto `AnnotationNode` / `valueRef` / `boundingBox`; they do not require replacing the coordinate system or path grammar.
+
+---
+
+## 15. Summary
 
 **Positioning** → normalized `boundingBox` (`x`, `y`, `width`, `height` in `0–1`).  
 **Formatting** → `fieldType` + `appearance` + optional `format` options.  
