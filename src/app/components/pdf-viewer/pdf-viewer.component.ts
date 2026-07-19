@@ -68,24 +68,25 @@ export class PdfViewerComponent {
       const scale = this.pdfService.scale();
       const doc = this.pdfService.pdfDocument();
       const page = this.pageNumber();
-      if (doc) {
-        void this.renderCanvas(page, scale);
+      // Track the canvas signal so we retry once the view child mounts.
+      const canvas = this.canvasRef()?.nativeElement;
+      if (doc && canvas) {
+        void this.renderCanvas(canvas, page, scale);
       }
     });
   }
 
-  private async renderCanvas(pageNumber: number, scale: number): Promise<void> {
-    const canvas = this.canvasRef()?.nativeElement;
-    if (!canvas) {
-      return;
-    }
-
+  private async renderCanvas(
+    canvas: HTMLCanvasElement,
+    pageNumber: number,
+    scale: number,
+  ): Promise<void> {
     try {
       const dims = await this.pdfService.renderPageToCanvas(canvas, pageNumber, scale);
       this.pageWidth.set(dims.width);
       this.pageHeight.set(dims.height);
     } catch {
-      // Canvas not ready yet
+      // Canvas/PDF not ready yet — a later effect run will retry.
     }
   }
 

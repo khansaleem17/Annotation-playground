@@ -29,8 +29,13 @@ export class TemplateService {
     }
   }
 
+  /**
+   * Merge PDF AcroForm widget geometry into the loaded template.
+   * Keeps the template structure as the source of truth and only upgrades
+   * bounding boxes (and adds known mapped fields) when widgets are present.
+   */
   applyPdfFormGeometry(formId: string, fields: PdfFormField[]): void {
-    if (formId !== 'irs_1040_2025') {
+    if (formId !== 'irs_1040_2025' || fields.length === 0) {
       return;
     }
 
@@ -41,56 +46,18 @@ export class TemplateService {
     }
 
     const byId = new Map(fields.map((field) => [field.id, field]));
-    const taxpayer = page.annotations.find((node) => node.id === 'taxpayer');
-    const dependents = page.annotations.find((node) => node.id === 'dependents');
-    if (!taxpayer || !dependents) {
-      return;
-    }
-
-    const createFields = (
-      definitions: ReadonlyArray<readonly [string, string, string, string]>,
-    ): AnnotationNode[] =>
-      definitions.flatMap(([fieldId, id, label, fieldType]) => {
-        const field = byId.get(fieldId);
-        const metadata = this.getFieldMetadata(id);
-        return field
-          ? [
-              {
-                id,
-                type: 'field',
-                label,
-                fieldType,
-                valueRef: metadata.valueRef,
-                bindingPath: metadata.bindingPath,
-                semanticEntity: metadata.semanticEntity,
-                boundingBox: field.boundingBox,
-                appearance: { fontSize: 9, textAlign: 'left', color: '#000000' },
-                extractionConfidence: 1,
-                reviewStatus: 'approved',
-              },
-            ]
-          : [];
-      });
-
-    const updatedTaxpayer = createFields([
+    const fieldDefs: ReadonlyArray<readonly [string, string, string, string]> = [
       ['f1_14', 'taxpayer.firstName', 'First Name', 'text'],
       ['f1_15', 'taxpayer.lastName', 'Last Name', 'text'],
       ['f1_16', 'taxpayer.ssn', 'SSN', 'ssn'],
-    ]);
-    const updatedSpouse = createFields([
       ['f1_17', 'spouse.firstName', 'First Name', 'text'],
       ['f1_18', 'spouse.lastName', 'Last Name', 'text'],
       ['f1_19', 'spouse.ssn', 'SSN', 'ssn'],
-    ]);
-    const updatedAddress = createFields([
       ['f1_20', 'address.street', 'Street Address', 'text'],
       ['f1_21', 'address.aptNumber', 'Apartment', 'text'],
       ['f1_22', 'address.city', 'City', 'text'],
       ['f1_23', 'address.state', 'State', 'text'],
       ['f1_24', 'address.zipCode', 'ZIP Code', 'text'],
-    ]);
-
-    const dependentDefinitions = [
       ['f1_31', 'dependents[0].firstName', 'Dependent 1 First Name', 'text'],
       ['f1_32', 'dependents[1].firstName', 'Dependent 2 First Name', 'text'],
       ['f1_35', 'dependents[0].lastName', 'Dependent 1 Last Name', 'text'],
@@ -99,21 +66,86 @@ export class TemplateService {
       ['f1_40', 'dependents[1].ssn', 'Dependent 2 SSN', 'ssn'],
       ['f1_43', 'dependents[0].relationship', 'Dependent 1 Relationship', 'text'],
       ['f1_44', 'dependents[1].relationship', 'Dependent 2 Relationship', 'text'],
-    ] as const;
-    const updatedDependents = createFields(dependentDefinitions);
-
-    const dynamicGroups: AnnotationNode[] = [
-      { id: 'spouse', type: 'group', label: 'Spouse', children: updatedSpouse },
-      { id: 'address', type: 'group', label: 'Address', children: updatedAddress },
     ];
+
+    const createField = (
+      fieldId: string,
+      id: string,
+      label: string,
+      fieldType: string,
+    ): AnnotationNode | null => {
+      const field = byId.get(fieldId);
+      if (!field) {
+        return null;
+      }
+      const metadata = this.getFieldMetadata(id);
+      return {
+        id,
+        type: 'field',
+        label,
+        fieldType,
+        valueRef: metadata.valueRef,
+        bindingPath: metadata.bindingPath,
+        semanticEntity: metadata.semanticEntity,
+        boundingBox: field.boundingBox,
+        appearance: { fontSize: 9, textAlign: 'left', color: '#000000' },
+        extractionConfidence: 1,
+        reviewStatus: 'approved',
+      };
+    };
+
+    const groupChildren = (ids: string[]): AnnotationNode[] =>
+      fieldDefs
+        .filter(([, annotationId]) => ids.some((prefix) => annotationId.startsWith(prefix)))
+        .map(([fieldId, id, label, fieldType]) => createField(fieldId, id, label, fieldType))
+        .filter((node): node is AnnotationNode => node !== null);
+
+    const taxpayerChildren = groupChildren(['taxpayer.']);
+    const spouseChildren = groupChildren(['spouse.']);
+    const addressChildren = groupChildren(['address.']);
+    const dependentChildren = groupChildren(['dependents[']);
+
+    // Prefer PDF-derived fields when available; otherwise keep template nodes
+    // so bounding boxes from the static annotation spec still render.
+    const keepOrReplace = (
+      existing: AnnotationNode | undefined,
+      id: string,
+      label: string,
+      children: AnnotationNode[],
+      fallbackType: 'group' | 'collection' = 'group',
+    ): AnnotationNode => {
+      if (children.length > 0) {
+        return {
+          id,
+          type: existing?.type ?? fallbackType,
+          label: existing?.label ?? label,
+          collectionItemLabel: existing?.collectionItemLabel,
+          rowStride: existing?.rowStride,
+          children,
+        };
+      }
+      return existing ?? { id, type: fallbackType, label, children: [] };
+    };
+
+    const existingTaxpayer = page.annotations.find((node) => node.id === 'taxpayer');
+    const existingSpouse = page.annotations.find((node) => node.id === 'spouse');
+    const existingAddress = page.annotations.find((node) => node.id === 'address');
+    const existingDependents = page.annotations.find((node) => node.id === 'dependents');
+    const otherNodes = page.annotations.filter(
+      (node) => !['taxpayer', 'spouse', 'address', 'dependents'].includes(node.id),
+    );
+
     const updatedPage = {
       ...page,
       annotations: [
-        { ...taxpayer, children: updatedTaxpayer },
-        ...dynamicGroups,
-        { ...dependents, children: updatedDependents },
+        keepOrReplace(existingTaxpayer, 'taxpayer', 'Taxpayer', taxpayerChildren),
+        keepOrReplace(existingSpouse, 'spouse', 'Spouse', spouseChildren),
+        keepOrReplace(existingAddress, 'address', 'Address', addressChildren),
+        keepOrReplace(existingDependents, 'dependents', 'Dependents', dependentChildren, 'collection'),
+        ...otherNodes,
       ],
     };
+
     this.template.set({
       ...template,
       pages: template.pages.map((candidate) =>

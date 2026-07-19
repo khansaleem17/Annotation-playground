@@ -73,10 +73,13 @@ export class PdfService {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
 
+    // Disable native AcroForm painting — we overlay values from the annotation spec.
+    // Avoids missing-standard-font failures on some filled IRS PDFs.
     await page.render({
       canvasContext: context,
       viewport,
       canvas,
+      annotationMode: 0, // AnnotationMode.DISABLE
     }).promise;
 
     return {
@@ -145,13 +148,21 @@ export class PdfService {
       }>;
 
       for (const annotation of annotations) {
-        if (
-          !annotation.fieldName ||
-          typeof annotation.fieldValue !== 'string' ||
-          !annotation.fieldValue.trim() ||
-          !annotation.rect ||
-          annotation.rect.length !== 4
-        ) {
+        // Include widgets even when empty so we can still place bounding boxes.
+        if (!annotation.fieldName || !annotation.rect || annotation.rect.length !== 4) {
+          continue;
+        }
+
+        const rawValue = annotation.fieldValue;
+        const value =
+          typeof rawValue === 'string'
+            ? rawValue.trim()
+            : rawValue === null || rawValue === undefined
+              ? ''
+              : String(rawValue);
+
+        // Skip unchecked checkboxes ("Off") — they are not printable values.
+        if (value === 'Off') {
           continue;
         }
 
@@ -163,7 +174,7 @@ export class PdfService {
 
         formFields.push({
           id: this.getFieldId(annotation.fieldName),
-          value: annotation.fieldValue.trim(),
+          value,
           pageNumber,
           boundingBox: {
             x: left / viewport.width,
